@@ -26,14 +26,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
+const express_1 = __importStar(require("express"));
 const dotenv = __importStar(require("dotenv"));
+const notesRouters_1 = __importDefault(require("./routes/notesRouters"));
 dotenv.config();
 const app = (0, express_1.default)();
-app.use(express_1.default.json());
-app.get('/', (req, res) => {
+app.use((0, express_1.json)());
+app.use((error, req, res, next) => {
+    res.json({
+        message: error.message
+    });
 });
-const port = process.env.PORT || 7000;
-app.listen("port", () => {
-    console.log(`server is running on ${port}`);
+// mssql.connect(dbConfig)
+// app.get('/',()=>{
+//     console.log ("This is my first get request")
+// })
+app.use('/notes', notesRouters_1.default);
+const port = process.env.PORT || 4000;
+app.listen(port, () => {
+    console.log(`server is running on ${port}............`);
 });

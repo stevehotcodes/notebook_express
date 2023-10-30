@@ -15,6 +15,7 @@
     "@types/dotenv": "^8.2.0",
     "@types/node": "^20.8.9",
     "@types/uuid": "^9.0.6",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",

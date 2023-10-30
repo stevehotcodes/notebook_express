@@ -3,10 +3,12 @@ import { addNewNote, deleteNote, getAllNotes, updateNote } from "../controllers/
 
 
 const notesRoutes:Router=Router();
+
+notesRoutes.get("/",getAllNotes);
 notesRoutes.post("/",addNewNote);
 notesRoutes.put("/:id",updateNote);
 notesRoutes.delete("/:id",deleteNote);
-notesRoutes.get("/notes",getAllNotes);
+
 
 
 export default notesRoutes

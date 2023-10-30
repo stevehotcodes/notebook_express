@@ -21,19 +21,32 @@ export async function addNewNote(req:Request,res:Response){
     let id=uid()
     let note:INote=req.body
 
-    let {title,content,createdAt}=note;
+    let {title,content}=note;
 
     let pool=await dbConnectService();
+
+    if(pool?.connected){
+        console.log('connected');
+        
+    }
     
   pool?.connect(async (err)=>{
         if(err){
             return err
         }
         else{
-            let insertNoteQueryStr=`INSERT INTO  notes VALUES(${id},${title},${content},${createdAt})`;
-            let result=await pool?.request().query(insertNoteQueryStr);
-            console.log(result)
+            console.log("hey I am the start of the adding function");
+            
+            let insertNoteQueryStr=`INSERT INTO notes (id, title, content) VALUES (@id, @title, @content)`;
 
+                await pool?.request()
+                .input('id', id)
+                .input('title', title)
+                .input('content', content)
+                .query(insertNoteQueryStr);
+
+            // console.log(result)
+             return res.status(200).json({message:"note added"})
         }
 
 
@@ -42,16 +55,17 @@ export async function addNewNote(req:Request,res:Response){
     
 }
 
-export async function getAllNotes(req:Response,res:Request){
+export async function getAllNotes(req:Request,res:Response){
     let pool=await dbConnectService();
     pool?.connect(async (err)=>{
         if(err){
             return err
         }
         else{
-            let insertNoteQueryStr=`SELECT * FROM  notes )`;
+            let insertNoteQueryStr=`SELECT * FROM  notes `;
             let result=await pool?.request().query(insertNoteQueryStr);
             console.log(result)
+            res.status(200).json(result?.recordset)
 
         }
     })
@@ -74,15 +88,17 @@ export async function updateNote(req:Request,res:Response){
 }
 
 export async function deleteNote (req:Request,res:Response){
-    let id=req.params
+    let {id}=req.params
 
     let pool=await dbConnectService();
 
-    pool?.connect(async(err)=>{
-        if(err){return err}
+    pool?.connect(async(err:Error)=>{
+        if(err){return err.message}
 
-        let deletedQueryStr=`UPDATE notes SET isDeleted=1 WHERE isDeleted=0 AND id=${id}`;
-        let result=await pool?.request().query(deletedQueryStr);
+        let deletedQueryStr=`DELETE FROM  notes  WHERE id=@id`;
+        let result=await pool?.request()
+        .input('id',id)
+        .query(deletedQueryStr);
         console.log(result)
     })
 
