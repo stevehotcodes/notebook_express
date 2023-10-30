@@ -4,15 +4,6 @@ import { dbConnectService } from "../services/dbConnectionService";
 import { Request,Response } from "express";
 import {v4 as uid}  from  "uuid"
 
-interface INote{
-    id:string,
-    title:string,
-    content:string,
-    createdAt:string,
-    isDeleted:number |0 |1
-}
-
-
 
 
 
@@ -72,16 +63,21 @@ export async function getAllNotes(req:Request,res:Response){
 }
 
 export async function updateNote(req:Request,res:Response){
-    let id=req.params;
-    let content:string=req.body;
+    let {id}=req.params;
+    let {content}=req.body;
     let pool=await dbConnectService();
 
     pool?.connect(async(err)=>{
         if(err){console.log(err)}
 
-        let updatedNoteQueryStr=`UPDATE notes SET content=${content} WHERE id=${id}`;
-        let result=await pool?.request().query(updatedNoteQueryStr);
+        let updatedNoteQueryStr=`UPDATE notes SET content=@content WHERE id=@id`;
+        let result=await pool?.request()
+        .input('content',content)
+        .input('id',id)
+        .query(updatedNoteQueryStr);
         console.log(result)
+
+        return res.status(200).json({message:"note updated"})
 
     })
 
@@ -100,6 +96,7 @@ export async function deleteNote (req:Request,res:Response){
         .input('id',id)
         .query(deletedQueryStr);
         console.log(result)
+        return res.status(200).json({message:"note deleted successfully"})
     })
 
 

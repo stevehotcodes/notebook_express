@@ -55,16 +55,17 @@ function getAllNotes(req, res) {
 exports.getAllNotes = getAllNotes;
 function updateNote(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        let id = req.params;
-        let content = req.body;
+        let { id } = req.params;
+        let { content } = req.body;
         let pool = yield (0, dbConnectionService_1.dbConnectService)();
         pool === null || pool === void 0 ? void 0 : pool.connect((err) => __awaiter(this, void 0, void 0, function* () {
             if (err) {
                 console.log(err);
             }
-            let updatedNoteQueryStr = `UPDATE notes SET content=${content} WHERE id=${id}`;
-            let result = yield (pool === null || pool === void 0 ? void 0 : pool.request().query(updatedNoteQueryStr));
+            let updatedNoteQueryStr = `UPDATE notes SET content=@content WHERE id=@id`;
+            let result = yield (pool === null || pool === void 0 ? void 0 : pool.request().input('content', content).input('id', id).query(updatedNoteQueryStr));
             console.log(result);
+            return res.status(200).json({ message: "note updated" });
         }));
     });
 }
@@ -80,6 +81,7 @@ function deleteNote(req, res) {
             let deletedQueryStr = `DELETE FROM  notes  WHERE id=@id`;
             let result = yield (pool === null || pool === void 0 ? void 0 : pool.request().input('id', id).query(deletedQueryStr));
             console.log(result);
+            return res.status(200).json({ message: "note deleted successfully" });
         }));
     });
 }
